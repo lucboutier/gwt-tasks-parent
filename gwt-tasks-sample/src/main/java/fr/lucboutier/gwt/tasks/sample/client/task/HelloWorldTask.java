@@ -1,15 +1,27 @@
 package fr.lucboutier.gwt.tasks.sample.client.task;
 
-import fr.cloudcad.serializer.StringSerializerFactory;
-import fr.lucboutier.gwt.tasks.sample.client.serializer.HelloWorldAbstractTaskSerializer;
+import com.kfuntak.gwt.json.serialization.client.JsonSerializable;
+
+import fr.lucboutier.gwt.tasks.Task;
 
 /**
- * The actual task is just used to register the required generated serializers.
+ * Simple task that returns "Hello <parameter>" as a result.
  * 
  * @author luc boutier
  */
-public class HelloWorldTask extends HelloWorldAbstractTask {
-	static {
-		StringSerializerFactory.register(HelloWorldTask.class.getName(), new HelloWorldAbstractTaskSerializer());
+public class HelloWorldTask extends Task<String> implements JsonSerializable {
+	private String parameter;
+
+	@Override
+	public String execute() {
+		return "Hello " + this.parameter;
+	}
+
+	public String getParameter() {
+		return parameter;
+	}
+
+	public void setParameter(String parameter) {
+		this.parameter = parameter;
 	}
 }

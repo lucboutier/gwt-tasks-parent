@@ -12,9 +12,8 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>fr.cloudcad.serialization.noreflect</groupId>
-			<artifactId>noreflect-core</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>fr.lucboutier.gwt</groupId>
+			<artifactId>gwt-json-serializer</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.google.gwt</groupId>

@@ -1,7 +1,9 @@
 package fr.lucboutier.gwt.tasks;
 
-import fr.cloudcad.serializer.IStringSerializable;
-import fr.cloudcad.serializer.StringSerializerFactory;
+import com.google.gwt.core.shared.GWT;
+import com.kfuntak.gwt.json.serialization.client.JsonSerializable;
+import com.kfuntak.gwt.json.serialization.client.Serializer;
+
 import fr.lucboutier.gwt.webworker.client.DedicatedWorkerEntryPoint;
 import fr.lucboutier.gwt.webworker.client.MessageEvent;
 import fr.lucboutier.gwt.webworker.client.MessageHandler;
@@ -11,10 +13,12 @@ import fr.lucboutier.gwt.webworker.client.MessageHandler;
  * 
  * @author luc boutier
  */
-public abstract class Task extends DedicatedWorkerEntryPoint implements MessageHandler {
+public abstract class Task<T extends Object> extends DedicatedWorkerEntryPoint implements MessageHandler {
 	public static final String TASK_COMPLETED_FLAG = "TC::";
 	public static final String TASK_ERROR_FLAG = "TERR::";
 	public static final String TASK_LOG_FLAG = "TLOG::";
+
+	private final Serializer serializer = GWT.create(Serializer.class);
 
 	@Override
 	public void onWorkerLoad() {
@@ -22,17 +26,25 @@ public abstract class Task extends DedicatedWorkerEntryPoint implements MessageH
 		setOnMessage(this);
 	}
 
+	/**
+	 * This method is used for web-worker only.
+	 * 
+	 * @param event The web worker message event.
+	 */
+	@SuppressWarnings("rawtypes")
 	public void onMessage(MessageEvent event) {
 		// parse parameters
 		String parameter = event.getDataAsString();
-		if (this instanceof IStringSerializable) {
-			StringSerializerFactory.getSerializer(this.getClass().getName()).deSerialize(parameter, this);
+		final Task task;
+		if (this instanceof JsonSerializable) {
+			task = this.serializer.deSerialize(parameter, this.getClass());
+		} else {
+			task = this;
 		}
 		try {
-			this.execute();
-			if (this instanceof IStringSerializable) {
-				postMessage(TASK_COMPLETED_FLAG
-						+ StringSerializerFactory.getSerializer(this.getClass().getName()).serialize(this));
+			task.execute();
+			if (this instanceof JsonSerializable) {
+				postMessage(TASK_COMPLETED_FLAG + this.serializer.serialize(task));
 			} else {
 				postMessage(TASK_COMPLETED_FLAG);
 			}
@@ -41,5 +53,10 @@ public abstract class Task extends DedicatedWorkerEntryPoint implements MessageH
 		}
 	}
 
-	public abstract void execute();
+	/**
+	 * Execute the task and return a result.
+	 * 
+	 * @return A result object.
+	 */
+	public abstract T execute();
 }

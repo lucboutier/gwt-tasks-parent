@@ -81,28 +81,30 @@ public class ThreadJobProcessor implements IJobProcessor {
 
 	@Override
 	public void processJob(final Job job) {
-		final Task[] tasks = job.getTasks();
+		final Task<?>[] tasks = job.getTasks();
+		final Object[] results = new Object[tasks.length];
 		final AtomicInteger completedCount = new AtomicInteger();
 		final AtomicInteger successCount = new AtomicInteger();
 
-		if (blockCallingThread) {
-			Future<?>[] futures = new Future<?>[tasks.length];
-			for (int i = 0; i < tasks.length; i++) {
-				final Task task = tasks[i];
-				futures[i] = executor.submit(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							task.execute();
-							onTaskCompleted(job, task, tasks.length, completedCount, successCount, true);
-						} catch (Throwable t) {
-							LOGGER.log(Level.SEVERE, "Error while processing task", t);
-							onTaskCompleted(job, task, tasks.length, completedCount, successCount, false);
-						}
+		Future<?>[] futures = new Future<?>[tasks.length];
+		for (int i = 0; i < tasks.length; i++) {
+			final int taskIndex = i;
+			final Task<?> task = tasks[taskIndex];
+			futures[i] = executor.submit(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						results[taskIndex] = task.execute();
+						onTaskCompleted(job, results, tasks.length, completedCount, successCount, true);
+					} catch (Throwable t) {
+						LOGGER.log(Level.SEVERE, "Error while processing task", t);
+						onTaskCompleted(job, results, tasks.length, completedCount, successCount, false);
 					}
-				});
-			}
+				}
+			});
+		}
 
+		if (blockCallingThread) {
 			for (Future<?> future : futures) {
 				try {
 					future.get();
@@ -112,25 +114,10 @@ public class ThreadJobProcessor implements IJobProcessor {
 					LOGGER.log(Level.SEVERE, "Unable to process job correctly", e);
 				}
 			}
-		} else {
-			for (final Task task : tasks) {
-				executor.submit(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							task.execute();
-							onTaskCompleted(job, task, tasks.length, completedCount, successCount, true);
-						} catch (Throwable t) {
-							LOGGER.log(Level.SEVERE, "Error while processing task", t);
-							onTaskCompleted(job, task, tasks.length, completedCount, successCount, false);
-						}
-					}
-				});
-			}
 		}
 	}
 
-	private void onTaskCompleted(final Job job, final Task task, final int totalCount,
+	private void onTaskCompleted(final Job job, final Object[] results, final int totalCount,
 			final AtomicInteger completedCount, final AtomicInteger successCount, boolean success) {
 		int currentCompleted = completedCount.incrementAndGet();
 		if (success) {
@@ -139,7 +126,7 @@ public class ThreadJobProcessor implements IJobProcessor {
 		int successCompleted = successCount.get();
 		LOGGER.info("Completed " + currentCompleted + " tasks on " + totalCount + " success " + successCompleted);
 		if (currentCompleted == totalCount) {
-			job.getCallback().onCompleted();
+			job.getCallback().onCompleted(results);
 		}
 	}
 }

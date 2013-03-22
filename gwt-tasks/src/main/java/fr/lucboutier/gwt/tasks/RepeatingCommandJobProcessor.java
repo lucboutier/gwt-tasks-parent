@@ -1,5 +1,6 @@
 package fr.lucboutier.gwt.tasks;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.gwt.core.client.Scheduler;
@@ -15,19 +16,21 @@ public class RepeatingCommandJobProcessor implements IJobProcessor {
 
 	@Override
 	public void processJob(final Job job) {
-		final Task[] tasks = job.getTasks();
+		final Task<?>[] tasks = job.getTasks();
+		final Object[] results = new Object[tasks.length];
 		RepeatingCommand repeatingCommand = new RepeatingCommand() {
 			int current = 0;
 
 			public boolean execute() {
 				if (current < tasks.length) {
-					LOGGER.info("Task " + current + "/" + tasks.length);
-					Task task = tasks[current];
-					task.execute();
+					if (LOGGER.isLoggable(Level.FINER)) {
+						LOGGER.finer("Task " + (current + 1) + "/" + tasks.length);
+					}
+					results[current] = tasks[current].execute();
 					current++;
 					return true;
 				}
-				job.getCallback().onCompleted();
+				job.getCallback().onCompleted(results);
 				return false;
 			}
 		};

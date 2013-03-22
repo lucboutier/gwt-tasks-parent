@@ -3,7 +3,7 @@
 <module>
 	<!-- Inherit the core Web Toolkit stuff. -->
 	<inherits name='com.google.gwt.core.Core' />
-	<inherits name='fr.cloudcad.GWTSerializer' />
+	<inherits name='com.kfuntak.gwt.json.serialization.GWTProJsonSerializer' />
 	<inherits name='fr.lucboutier.gwt.webworker.WebWorker' />
 
 	<!-- Specify the paths for translatable code -->

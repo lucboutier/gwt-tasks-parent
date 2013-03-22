@@ -18,6 +18,9 @@ $stats = function() {
 };
 $self = self;
 $sessionId = null;
+$wnd = self;
+$doc = self;
+window = self;
 
 function __MODULE_FUNC__() {
 	// TODO(zundel): Add slot for property providers.

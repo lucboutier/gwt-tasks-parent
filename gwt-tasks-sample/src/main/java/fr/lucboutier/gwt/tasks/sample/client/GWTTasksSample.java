@@ -41,8 +41,8 @@ public class GWTTasksSample implements EntryPoint {
 
 		final Job job = new Job(new Task[] { task }, new IJobCompletedCallback() {
 			@Override
-			public void onCompleted() {
-				label.setText("Parameter <" + task.getParameter() + "> Result <" + task.getResult().toString() + ">");
+			public void onCompleted(Object[] results) {
+				label.setText("Parameter <" + task.getParameter() + "> Result <" + results[0] + ">");
 			}
 		});
 

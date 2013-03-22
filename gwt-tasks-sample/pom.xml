@@ -13,7 +13,6 @@
 
 	<properties>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
-		<noreflect.serialization.package.name>fr.lucboutier.gwt.tasks.sample.client.serializer</noreflect.serialization.package.name>
 	</properties>
 
 	<dependencies>
@@ -32,7 +31,7 @@
 		</dependency>
 		<dependency>
 			<groupId>fr.lucboutier.gwt</groupId>
-			<artifactId>gwt-tasks-webworker-linker</artifactId>
+			<artifactId>gwt-tasks-webworker</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
@@ -71,7 +70,7 @@
 					</dependency>
 					<dependency>
 						<groupId>fr.lucboutier.gwt</groupId>
-						<artifactId>gwt-tasks-webworker-linker</artifactId>
+						<artifactId>gwt-tasks-webworker</artifactId>
 						<version>${project.version}</version>
 					</dependency>
 				</dependencies>
@@ -93,46 +92,6 @@
 				<configuration>
 					<webappDirectory>${webappDirectory}</webappDirectory>
 				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>fr.cloudcad.serialization.noreflect</groupId>
-				<artifactId>noreflect-generator-maven-plugin</artifactId>
-				<version>0.0.1-SNAPSHOT</version>
-				<executions>
-					<execution>
-						<id>pok</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<inherited>false</inherited>
-						<configuration>
-							<classes>
-								<param>fr.lucboutier.gwt.tasks.sample.client.task.HelloWorldAbstractTask</param>
-							</classes>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.7</version>
-				<executions>
-					<execution>
-						<id>add-source</id>
-						<goals>
-							<goal>add-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>${project.build.directory}/generated-sources/noreflectserial</source>
-							</sources>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>

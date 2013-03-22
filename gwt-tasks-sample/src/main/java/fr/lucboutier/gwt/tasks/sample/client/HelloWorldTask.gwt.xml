@@ -7,20 +7,16 @@
 	<define-linker name="dedicatedworker"
 		class="fr.lucboutier.gwt.webworker.linker.DedicatedWorkerLinker" />
 
-	<!-- Specify the app entry point class. -->
+	<!-- Specify the worker entry point class. -->
 	<entry-point
 		class='fr.lucboutier.gwt.tasks.sample.client.task.HelloWorldTask' />
-
 
 	<!-- Specify the paths for translatable code -->
 	<source path='task' />
 
-	<!-- <set-property name="user.agent" value="ie6" /> -->
-	<!-- <set-property name="user.agent" value="ie8" /> -->
-	<!-- <set-property name="user.agent" value="gecko1_8" /> -->
-	<!-- <set-property name="user.agent" value="safari" /> -->
-	<!-- <set-property name="user.agent" value="opera" /> -->
-	<!-- <set-property name="user.agent" value="ie9" /> -->
+	<set-property name="user.agent" value="safari" />
+	<set-configuration-property name="user.agent.runtimeWarning"
+		value="false" />
 
 	<!-- Use the WebWorker linker for a Dedicated worker -->
 	<add-linker name="dedicatedworker" />
